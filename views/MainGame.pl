@@ -5,9 +5,11 @@ use strict;
 #variaveis globais
 my $main = MainWindow->new;
 my $top;
+my $menuBar;
 my $acc_water = 0;
 my $acc_ship = 0;
 my $qnt_ship = 0;
+my $font = $main->fontCreate(-size => 13, -weight => 'bold');
 
 my @matriz_ENEMY = (
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -34,15 +36,27 @@ my @matriz_MY = (
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 
+
+sub menuBar{
+    $menuBar = $main->Frame(-relief => 'groove', -borderwidth => 3, -background => 'gray')->pack(-side => 'top', -fill =>'x');
+    my $new = $menuBar->Menubutton(-text => "Novo Jogo", -background => 'white', -foreground =>'black', -width => 0, -height => 1.5, -font => $font)->pack(-side => 'left');
+    my $exit = $menuBar->Menubutton(-text => "Sair", -background => 'white', -foreground =>'black', -width => 3, -height => 1.5, -font => $font)->pack(-side => 'right');
+ 
+
+}
+
 sub start{
     $main->minsize(qw(1100 900));
     $main->title("Batalha naval");
     $main->configure(-background => "white");
 
+
+    menuBar();
     $top = $main->Frame(-background => "white");
     $top->pack(-side => 'top', -fill => 'x');
 
     plotMatrix(\@matriz_ENEMY, 'unblocked');
+    my $left = $top->Frame(-background => "white")->pack(-side => 'left', -pady => 1, -padx => 20);
     plotMatrix(\@matriz_MY, 'blocked');
     
     MainLoop();
