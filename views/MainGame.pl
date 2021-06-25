@@ -114,7 +114,6 @@ sub enemyTurn {
             #turno do jogador    
         }
     }
-
 }
 
 sub plotMatrix  {
