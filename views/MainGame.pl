@@ -9,12 +9,13 @@ my $acc_water = 0;
 my $acc_ship = 0;
 my $qnt_ship = 0;
 my $turn = 1;
-
+my $acc_enemy = 0;
 my $font = $main->fontCreate(-size => 13, -weight => 'bold');
 my $font2 = $main->fontCreate(-size => 17, -weight => 'bold');
 my $turn_label; 
 my $pont_label; 
 my $acc_label;
+my $qnt_ship_enemy = 0;
 
 my @btn_enemy;
 
@@ -53,7 +54,7 @@ sub menuBar{
 
 sub start{
     #startar tela
-    $main->minsize(qw(1100 900));
+    $main->minsize(qw(1100 700));
     $main->title("Batalha naval");
     $main->configure(-background => "white");
 
@@ -67,7 +68,6 @@ sub start{
     my $points = $top->Frame(-background => "white");
     $points->pack(-side => 'top', -fill => 'x');
     
-
     my $left1       = $points->Frame(-background => 'white')->pack(-side => 'left', -padx => 0);
     $pont_label     = $left1->Label(-text => "Sua pontuacao eh: $acc_ship/$qnt_ship", -background => 'white', -width => 25, -height => 1.5, -font => $font, -anchor => 'w')->pack();
     $acc_label      = $left1->Label(-text => "Acertos agua: $acc_water | navios: $acc_ship", -background => 'white', -width => 25, -height => 1.5, -font => $font, -anchor => 'w')->pack();
@@ -98,19 +98,20 @@ sub enemyTurn {
     #funcão que retorna valor da posicao da matriz (COMUNICACAO COM BACK)
     my $valor = 0;
     
-    #atualizar matriz inimiga
-    $btn_my[$i][$j]->configure(-text=>"$valor");
 
     if($valor == 0){
-        
+        #atualizar matriz inimiga
+        $btn_my[$i][$j]->configure(-text=>"9");
+        #turno do jogador
     }
     else{
-        $acc_ship = $acc_ship + 1; 
-        
-        if($acc_ship == $qnt_ship){
-            
+        $acc_enemy = $acc_enemy + 1; 
+        #atualizar matriz inimiga
+        $btn_my[$i][$j]->configure(-text=>"$valor");    
+        if($acc_enemy == $qnt_ship_enemy){
+            lost();
         }else{
-            
+            #turno do jogador    
         }
     }
 
@@ -138,13 +139,20 @@ sub plotMatrix  {
             }else{
                 $btn_my[$i][$j] = $left->Button(-text => "0", -width => 3, -height => 3, -background => "white");
                 $btn_my[$i][$j]->configure(-command => [\&click, $j, $i, $btn_my[$i][$j]]);
-                $btn_my[$i][$j]->pack();  
+                $btn_my[$i][$j]->pack(); 
+                if($final[$i][$j] != 0){
+                    $qnt_ship_enemy = $qnt_ship_enemy + 1;
+                } 
             }
         }   
     }   
 }
 
 sub won {
+
+}
+
+sub lost{
 
 }
 
@@ -155,14 +163,16 @@ sub click {
     #funcão que retorna valor da posicao da matriz (COMUNICACAO COM BACK)
     my $valor = 0;
     
-    #atualizar matriz
-    $clicked[2]->configure(-text=>"$valor");
-
+    
     if($valor == 0){
         $acc_water = $acc_water + 1;
+        #atualizar matriz
+        $clicked[2]->configure(-text=>"9");
     }
     else{
         $acc_ship = $acc_ship + 1; 
+        #atualizar matriz
+        $clicked[2]->configure(-text=>"$valor");
         
         if($acc_ship == $qnt_ship){
             won();
