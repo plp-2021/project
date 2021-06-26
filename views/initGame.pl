@@ -1,6 +1,5 @@
 use Tk; 
 use strict;
-
 # Criando janela principal
 my $thisWindow = MainWindow->new;
 
@@ -27,6 +26,39 @@ my @btn_orientacao;
 my @label_navios = ('Porta Aviao', 'Guerra', 'Encouracado', 'Submarino');
 my @label_orientacao = ('Horizontal', 'Vertical');
 
+#Variaveis de controle do jogo
+my $acc_water = 0;
+my $acc_ship = 0;
+my $qnt_ship = 0;
+my $turn = 1;
+my $acc_enemy = 0;
+
+#Fontes do jogo
+my $font = $thisWindow->fontCreate(-size => 13, -weight => 'bold');
+my $font2 = $thisWindow->fontCreate(-size => 17, -weight => 'bold');
+
+#Textos do jogos
+my $turn_label; 
+my $pont_label; 
+my $acc_label;
+my $qnt_ship_enemy = 0;
+
+my @btn_enemy;
+
+my @btn_my;
+
+my @matriz_ENEMY = (
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+
 my @matriz_MY = (
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -39,11 +71,19 @@ my @matriz_MY = (
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 
-
 sub topBar{
     $topBar = $thisWindow->Frame(-relief => 'groove', -borderwidth => 3, -background => 'gray')->pack(-side => 'top', -fill =>'x');
-    my $new = $topBar->Menubutton(-text => "Iniciar", -background => 'white', -foreground =>'black', -width => 0, -height => 1.5, -font => $font)->pack(-side => 'left');
-    my $exit = $topBar->Menubutton(-text => "Sair", -background => 'white', -foreground =>'black', -width => 3, -height => 1.5, -font => $font)->pack(-side => 'right');
+    my $new = $topBar->Button(-text => "Iniciar", -command => [\&newGame], -background => 'white', -foreground =>'black', -width => 0, -height => 1.5, -font => $font)->pack(-side => 'left');
+    my $exit = $topBar->Button(-text => "Sair", -command => [\&exitGame], -background => 'white', -foreground =>'black', -width => 3, -height => 1.5, -font => $font)->pack(-side => 'right');
+}
+
+sub exitGame{
+    $thisWindow->destroy;
+}
+
+sub newGame{
+    $thisWindow->packForget();
+    startGame();
 }
 
 sub start{
@@ -137,14 +177,11 @@ sub click{
             }
         }
     }else{
-
+        my $response = $thisWindow->messageBox(-icon => 'error', -message => 'Nao eh possivel adicionar navio', -title => 'Error', -type => 'AbortRetryIgnore', -default => 'Retry');
     } 
-
-
-
 }
 sub foo {
-  return (1,(
+  return (0,(
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
