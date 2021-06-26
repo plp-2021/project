@@ -2,16 +2,25 @@ use Tk;
 use strict;
 
 #variaveis globais
+#Janela
 my $main = MainWindow->new;
+#Frame -> div
 my $top;
+#Top bar
 my $menuBar;
+
+#Variaveis de controle do jogo
 my $acc_water = 0;
 my $acc_ship = 0;
 my $qnt_ship = 0;
 my $turn = 1;
 my $acc_enemy = 0;
+
+#Fontes do jogo
 my $font = $main->fontCreate(-size => 13, -weight => 'bold');
 my $font2 = $main->fontCreate(-size => 17, -weight => 'bold');
+
+#Textos do jogos
 my $turn_label; 
 my $pont_label; 
 my $acc_label;
@@ -137,7 +146,6 @@ sub plotMatrix  {
                 }
             }else{
                 $btn_my[$i][$j] = $left->Button(-text => "0", -width => 3, -height => 3, -background => "white");
-                $btn_my[$i][$j]->configure(-command => [\&click, $j, $i, $btn_my[$i][$j]]);
                 $btn_my[$i][$j]->pack(); 
                 if($final[$i][$j] != 0){
                     $qnt_ship_enemy = $qnt_ship_enemy + 1;
