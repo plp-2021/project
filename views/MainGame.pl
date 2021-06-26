@@ -3,11 +3,11 @@ use strict;
 
 #variaveis globais
 #Janela
-my $main = MainWindow->new;
+my $thisWindow = MainWindow->new;
 #Frame -> div
 my $top;
 #Top bar
-my $menuBar;
+my $topBar;
 
 #Variaveis de controle do jogo
 my $acc_water = 0;
@@ -17,8 +17,8 @@ my $turn = 1;
 my $acc_enemy = 0;
 
 #Fontes do jogo
-my $font = $main->fontCreate(-size => 13, -weight => 'bold');
-my $font2 = $main->fontCreate(-size => 17, -weight => 'bold');
+my $font = $thisWindow->fontCreate(-size => 13, -weight => 'bold');
+my $font2 = $thisWindow->fontCreate(-size => 17, -weight => 'bold');
 
 #Textos do jogos
 my $turn_label; 
@@ -55,23 +55,27 @@ my @matriz_MY = (
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
 
 
-sub menuBar{
-    $menuBar = $main->Frame(-relief => 'groove', -borderwidth => 3, -background => 'gray')->pack(-side => 'top', -fill =>'x');
-    my $new = $menuBar->Menubutton(-text => "Novo Jogo", -background => 'white', -foreground =>'black', -width => 0, -height => 1.5, -font => $font)->pack(-side => 'left');
-    my $exit = $menuBar->Menubutton(-text => "Sair", -background => 'white', -foreground =>'black', -width => 3, -height => 1.5, -font => $font)->pack(-side => 'right');
+sub topBar{
+    $topBar = $thisWindow->Frame(-relief => 'groove', -borderwidth => 3, -background => 'gray')->pack(-side => 'top', -fill =>'x');
+    my $new = $topBar->Button(-text => "Iniciar", -command => [\&newGame], -background => 'white', -foreground =>'black', -width => 0, -height => 1.5, -font => $font)->pack(-side => 'left');
+    my $exit = $topBar->Button(-text => "Sair", -command => [\&exitGame], -background => 'white', -foreground =>'black', -width => 3, -height => 1.5, -font => $font)->pack(-side => 'right');
+}
+
+sub exitGame{
+    $thisWindow->destroy;
 }
 
 sub start{
     #startar tela
-    $main->minsize(qw(1100 700));
-    $main->title("Batalha naval");
-    $main->configure(-background => "white");
+    $thisWindow->minsize(qw(1100 700));
+    $thisWindow->title("Batalha naval");
+    $thisWindow->configure(-background => "white");
 
     #startar barra de menu
-    menuBar();
+    topBar();
 
     #start pontuacoes
-    $top = $main->Frame(-background => "white");
+    $top = $thisWindow->Frame(-background => "white");
     $top->pack(-side => 'top', -fill => 'x');
 
     my $points = $top->Frame(-background => "white");
@@ -93,10 +97,6 @@ sub start{
     plotMatrix(\@matriz_MY, 'blocked');
     
     MainLoop();
-}
-
-sub exitGame {
-
 }
 
 sub enemyTurn {
