@@ -1,6 +1,7 @@
 #!/usr/bin/perl
 use Tk; 
 use strict;
+require "./back.pl";
 
 # Criando janela principal
 my $thisWindow = MainWindow->new;
@@ -24,7 +25,7 @@ my @btn_orientacao;
 
 #Label Navio
 my @label_navios = ('Porta Aviao', 'Guerra', 'Encouracado', 'Submarino');
-my @label_orientacao = ('Horizontal', 'Vertical');
+my @label_orientacao = ('Vertical', 'Horizontal');
 
 #Variaveis de controle do jogo
 my $acc_water = 0;
@@ -199,6 +200,7 @@ sub plotMatrixJogo  {
 }
 
 sub enemyTurn {
+
     $turn = $turn + 1;
     $turn_label->configure(-text => "Turno $turn: turno do inimigo!", -foreground => 'red'); 
 
@@ -207,8 +209,8 @@ sub enemyTurn {
     my $i   =   0; 
     my $j   =   0; 
 
-    #funcão que retorna valor da posicao da matriz (i, j) (COMUNICACAO COM BACK)
-    my $valor = 0;
+    #funcão que retorna valor da posicao da matriz (i, j) (COMUNICACAO COM BACK) PRONTOOOOOOOOOOOo
+    my $valor = jogadaENEMY($i, $j);
     
 
     if($valor == 0){
@@ -232,7 +234,7 @@ sub enemyTurn {
 }
 
 sub won {
-my $response = $thisWindow->messageBox(-icon => 'sucess', -message => 'Voce Venceu!', -title => 'Vencedor', -type => 'AbortRetryIgnore', -default => 'Retry');
+    my $response = $thisWindow->messageBox(-message => 'Voce Venceu!', -title => 'Vencedor', -type => 'AbortRetryIgnore', -default => 'Retry');
 }
 
 sub lost {
@@ -244,24 +246,25 @@ sub clickJogar {
     disable();
     my @clicked=@_;
     
-    #funcão que retorna valor da posicao da matriz (COMUNICACAO COM BACK)
+    #funcão que retorna valor da posicao da matriz (COMUNICACAO COM BACK) PRONTOOOOOOO
     #Retorno {
     #  tipo de barco no ponto(i, j)
     #}
-    my $valor = 0;
+    my $valor = jogada($clicked[1], $clicked[0]);
     
     
     if($valor == 0){
         $acc_water = $acc_water + 1;
         #atualizar matriz
         $clicked[2]->configure(-text=>"9");
+        $acc_label->configure(-text => "Acertos agua: $acc_water");
         enemyTurn();
     }
     else{
         $acc_ship = $acc_ship + 1; 
         #atualizar matriz
         $clicked[2]->configure(-text=>"$valor");
-        
+        $pont_label->configure(-text => "Sua pontuacao eh: $acc_ship/$qnt_ship");
         if($acc_ship == $qnt_ship){
             won();
         }else{
@@ -293,7 +296,7 @@ sub startGame{
     
     my $left1       = $points->Frame(-background => 'white')->pack(-side => 'left', -padx => 0);
     $pont_label     = $left1->Label(-text => "Sua pontuacao eh: $acc_ship/$qnt_ship", -background => 'white', -width => 25, -height => 1.5, -font => $font, -anchor => 'w')->pack();
-    $acc_label      = $left1->Label(-text => "Acertos agua: $acc_water | navios: $acc_ship", -background => 'white', -width => 25, -height => 1.5, -font => $font, -anchor => 'w')->pack();
+    $acc_label      = $left1->Label(-text => "Acertos agua: $acc_water", -background => 'white', -width => 25, -height => 1.5, -font => $font, -anchor => 'w')->pack();
     $turn_label     = $left1->Label(-text => "Turno $turn: Seu turno!", -background => 'white', -width => 25, -height => 1.5, -font => $font, -foreground => 'green', -anchor => 'w')->pack();
     
     #startar matrix
@@ -302,8 +305,21 @@ sub startGame{
     my $label_3 = $name->Label(-text => "Campo Inimigo", -background => 'white', -width => 12, -height => 1.5, -font => $font2)->pack(-side => 'left', -padx => 167);
     my $label_4 = $name->Label(-text => "Seu Campo", -background => 'white', -width => 12, -height => 1.5, -font => $font2)->pack(-side => 'right', -padx => 165);
 
+    @matriz_ENEMY = adicionarBarcosMaquina();
+    
+    for(my $i = 0 ; $i< 10; $i++){
+    for(my $j = 0; $j< 10; $j++){
+        print "$matriz_ENEMY[$i][$j]";
+    }
+    print "\n";
+    }
+
     plotMatrixJogo(\@matriz_ENEMY, 'unblocked');
+    $pont_label->configure(-text => "Sua pontuacao eh: $acc_ship/$qnt_ship");
     my $midle   = $container->Frame(-background => "white")->pack(-side => 'left', -pady => 1, -padx => 20);
+
+    
+
     plotMatrixJogo(\@matriz_MY, 'blocked');
     
     MainLoop();
@@ -329,38 +345,30 @@ sub plotMatrix  {
 
 sub click {
     my @clicked=@_;
-    #funcao que retorna a minha matriz validada (COMUNICACAO COM BACK)
+    #funcao que retorna a minha matriz validada (COMUNICACAO COM BACK) PRONTOOOOOOOOOOOOOO
     #Retorno {
     #  [True e matriz] or [False e Mensagem]
     #}
-    #print("$selectOrientacao, $selectNavio, $clicked[0], $clicked[1]");
     my $retorno;
     my @array; 
 
-    ($retorno, @array) = &foo();
+    ($retorno, @array) = &adicionarBarcos($selectNavio, $clicked[1], $clicked[0], $selectOrientacao, 0);
 
-    if($retorno){
+    if($retorno == 0){
+        @matriz_MY = @array;
         for(my $i = 0; $i < 10; $i++){
             for(my $j = 0; $j < 10; $j++){
                 $btns_barcos[$i][$j]->configure(-text=>"$array[$i][$j]");
+
+
+                if($array[$i][$j] != 0){
+                    $btns_barcos[$i][$j]->configure(-state => 'disabled');
+                }
             }
         }
     }else{
         my $response = $thisWindow->messageBox(-icon => 'error', -message => 'Nao eh possivel adicionar navio', -title => 'Error', -type => 'AbortRetryIgnore', -default => 'Retry');
     } 
-}
-sub foo {
-  return (0,(
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
-        [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]));
 }
 
 sub disable {
