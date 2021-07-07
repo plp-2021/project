@@ -3,6 +3,7 @@ use Tk;
 use strict;
 require "./back.pl";
 
+
 # Criando janela principal
 my $thisWindow = MainWindow->new;
 
@@ -55,6 +56,8 @@ my @btns_jogador;
 my @btns_computador;
 my @btns_barcos;
 
+
+
 my @matriz_ENEMY = (
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -78,6 +81,20 @@ my @matriz_MY = (
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+
+
+my @matriz_jogadas = (
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+
 
 sub topBar{
     $topBar = $thisWindow->Frame(-relief => 'groove', -borderwidth => 3, -background => 'gray')->pack(-side => 'top', -fill =>'x');
@@ -208,11 +225,12 @@ sub enemyTurn {
     
     my $i   =   0; 
     my $j   =   0; 
-
+    
+    ($i, $j) = jogadasComputador();
     #funcão que retorna valor da posicao da matriz (i, j) (COMUNICACAO COM BACK) PRONTOOOOOOOOOOOo
     my $valor = jogadaENEMY($i, $j);
+    print($i, $j);
     
-
     if($valor == 0){
         #atualizar matriz inimiga
         $btns_computador[$i][$j]->configure(-text=>"9");
@@ -224,7 +242,7 @@ sub enemyTurn {
     else{
         $acc_enemy = $acc_enemy + 1; 
         #atualizar matriz inimiga
-        $btns_computador[$i][$j]->configure(-text=>"$valor");    
+        $btns_computador[$i][$j]->configure(-text=>"8");    
         if($acc_enemy == $qnt_ship_enemy){
             lost();
         }else{
@@ -238,7 +256,7 @@ sub won {
 }
 
 sub lost {
-my $response = $thisWindow->messageBox(-icon => 'error', -message => 'Voce perdeu :(', -title => 'Perdedor', -type => 'AbortRetryIgnore', -default => 'Retry');
+    my $response = $thisWindow->messageBox(-icon => 'error', -message => 'Voce perdeu :(', -title => 'Perdedor', -type => 'AbortRetryIgnore', -default => 'Retry');
 }
 
 sub clickJogar {
@@ -250,20 +268,29 @@ sub clickJogar {
     #Retorno {
     #  tipo de barco no ponto(i, j)
     #}
+    
     my $valor = jogada($clicked[1], $clicked[0]);
     
-    
+
+    my $i = $clicked[1];
+    my $j = $clicked[0];
+
     if($valor == 0){
         $acc_water = $acc_water + 1;
         #atualizar matriz
         $clicked[2]->configure(-text=>"9");
+
+        $matriz_jogadas[$i][$j] = 1;
+
         $acc_label->configure(-text => "Acertos agua: $acc_water");
         enemyTurn();
     }
     else{
         $acc_ship = $acc_ship + 1; 
         #atualizar matriz
-        $clicked[2]->configure(-text=>"$valor");
+        $clicked[2]->configure(-text=>"8");
+        $matriz_jogadas[$i][$j] = 1;
+
         $pont_label->configure(-text => "Sua pontuacao eh: $acc_ship/$qnt_ship");
         if($acc_ship == $qnt_ship){
             won();
@@ -305,8 +332,9 @@ sub startGame{
     my $label_3 = $name->Label(-text => "Campo Inimigo", -background => 'white', -width => 12, -height => 1.5, -font => $font2)->pack(-side => 'left', -padx => 167);
     my $label_4 = $name->Label(-text => "Seu Campo", -background => 'white', -width => 12, -height => 1.5, -font => $font2)->pack(-side => 'right', -padx => 165);
 
-    @matriz_ENEMY = adicionarBarcosMaquina();
+    @matriz_ENEMY = adicionarBarcosMaquina();     
     
+
     for(my $i = 0 ; $i< 10; $i++){
     for(my $j = 0; $j< 10; $j++){
         print "$matriz_ENEMY[$i][$j]";
@@ -381,8 +409,12 @@ sub disable {
 
 sub able {
     for(my $i = 0; $i < 10; $i++){
-        for(my $j = 0; $j < 10 ; $j++){             
-            $btns_jogador[$i][$j]->configure(-state => 'normal');  
+        for(my $j = 0; $j < 10 ; $j++){                  
+            if($matriz_jogadas[$i][$j] == 1){
+                $btns_jogador[$i][$j]->configure(-state => 'disabled');  
+            }else{
+                $btns_jogador[$i][$j]->configure(-state => 'normal'); 
+            }    
         }   
     }
 }
