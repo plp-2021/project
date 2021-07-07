@@ -195,9 +195,9 @@ sub removerQuantBarcos {
 sub adicionarBarcosMaquina{ 
 
     my $posicao     = int rand(2);
-    my $barc        = int rand(10);
+    my $barc        = 1 + int rand(4);
     my $posicaoI    = int rand(10);
-    my $posicaoJ    = 1 + int rand(4);
+    my $posicaoJ    = int rand(10);
     my $existeBarco = verificarExisteBarco($barc);
     my $maquina     = 1;
     
@@ -239,3 +239,16 @@ sub jogadaENEMY {
 
     return $matriz_MY[$i][$j];
 }
+
+
+sub jogadasComputador{
+
+    my $posI  = int rand(10);
+    my $posJ  = int rand(10);
+    return ($posI,$posJ); 
+}
+
+
+
+
+
